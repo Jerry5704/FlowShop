@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.14.0, 2020-12-22T19:54:43. -->
+<!-- Written by QtCreator 4.14.0, 2021-01-19T14:31:09. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -341,6 +341,7 @@
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebugger">false</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
+    <value type="bool" key="RunConfiguration.UseTerminal">true</value>
     <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/jerry/QtProjects/build-MaxFlowProblem-Desktop-Debug</value>
    </valuemap>
    <value type="int" key="ProjectExplorer.Target.RunConfigurationCount">1</value>

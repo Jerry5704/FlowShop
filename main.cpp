@@ -16,13 +16,17 @@ double generateRandomDoubleNumber (double from, double to) {
 }
 
 int calculateC(std::vector<std::vector<int>>& matrix, std::vector<int> &perm, int numberOfTasks, int numberOfMachines) {
-    int sum = 0;
-    for (int j = 1; j < numberOfTasks + 1; j++) {
-        for (int k = 1; k < numberOfMachines + 1; k++) {
-            sum += std::max(matrix[perm[j]][k - 1], matrix[perm[j - 1]][k]) + matrix[perm[j]][k];
+    std::vector <int> previousTaskEndTime(numberOfMachines + 1, 0);
+    std::vector <int> currentTaskEndTime(numberOfMachines + 1, 0);
+
+    for (int j = 1; j <= numberOfTasks; j++) {
+        for (int k = 1; k <= numberOfMachines; k++) {
+            currentTaskEndTime[k] = std::max(previousTaskEndTime[k], currentTaskEndTime[k - 1]) + matrix[perm[j-1]][k];
         }
+        previousTaskEndTime = currentTaskEndTime;
+        currentTaskEndTime.assign(numberOfMachines+1, 0);
     }
-    return sum;
+    return previousTaskEndTime[numberOfMachines];
 }
 
 void checkIfEqual(int firstRandomNumber, int secondRandomNumber, int numberOfTasks) {
@@ -39,8 +43,8 @@ void switchPlaces(int firstPosition, int secondPosition, std::vector<int>& perm)
     perm[firstPosition] = tempPosition;
 }
 
-void loadData(int &numberOfTasks, int &numberOfMachines, std::vector <std::vector <int>> &matrix) {
-    std::ifstream file ("/home/jerry/QtProjects/MaxFlowProblem/data1.txt");
+void loadData(int &numberOfTasks, int &numberOfMachines, std::vector <std::vector <int>> &matrix, std::string numberOfFile) {
+    std::ifstream file ("/home/jerry/QtProjects/MaxFlowProblem/data" + numberOfFile +".txt");
     std::string stringNumberOfTasks;
     std::string stringNumberOfMachines;
     file >> stringNumberOfTasks;
@@ -86,6 +90,7 @@ int saResult(std::vector <std::vector <int>> matrix, int numberOfTasks, int numb
     std::vector <int> perm;
     for (int i = 1; i < numberOfTasks + 1; i++)
         perm.push_back(i);
+    std::vector <int> bestPerm = perm;
     int initialResult; // x0
     initialResult = calculateC(matrix, perm, numberOfTasks, numberOfMachines);
     int currentResult = initialResult; // x
@@ -97,7 +102,7 @@ int saResult(std::vector <std::vector <int>> matrix, int numberOfTasks, int numb
     double delta;
     double p;
     double z;
-    double coolingRate = 0.995;
+    double coolingRate = 0.9995;
     while (currentTemperature > finalTemperature) {
         int firstRandomNumber;
         firstRandomNumber = generateRandomNumber(1, numberOfTasks);
@@ -108,6 +113,7 @@ int saResult(std::vector <std::vector <int>> matrix, int numberOfTasks, int numb
         newResult = calculateC(matrix, perm, numberOfTasks, numberOfMachines);
         if (bestResult > newResult) {
             bestResult = newResult;
+            bestPerm = perm;
         }
         if (newResult <= currentResult)
             currentResult = newResult;
@@ -123,14 +129,33 @@ int saResult(std::vector <std::vector <int>> matrix, int numberOfTasks, int numb
     return bestResult;
 }
 
+void printResults(int result, int numberOfFile) {
+    int intermediateResults[9] = {48, 799, 1340, 1991, 1540, 1856, 2787, 7108, 8042};
+    int bestResults[9] = {47, 637, 1163, 1805, 1137, 1471, 2397, 5967, 6369};
+
+    std::cout << "Intermediate result: " + std::to_string(intermediateResults[numberOfFile-1]) << std::endl;
+    std::cout << "Result obtained: " + std::to_string(result) << std::endl;
+    std::cout << "Best result: " + std::to_string(bestResults[numberOfFile-1]) << std::endl;
+}
+
+int chooseFile() {
+    int number;
+    std::cout << "Choose a data file (from 1 to 9): ";
+    std::cin >> number;
+    return number;
+}
+
 int main() {
     int numberOfTasks = 0;
     int numberOfMachines = 0;
     std::vector <std::vector <int>> matrix;
     int result = 0;
-    loadData(numberOfTasks, numberOfMachines, matrix);
-//    printMatrix(numberOfTasks, numberOfMachines, matrix);
+    while (1) {
+    int numberOfFile = chooseFile();
+    loadData(numberOfTasks, numberOfMachines, matrix, std::to_string(numberOfFile));
+    printMatrix(numberOfTasks, numberOfMachines, matrix);
     result = saResult(matrix, numberOfTasks, numberOfMachines);
-    std::cout << result << std::endl;
+    printResults(result, numberOfFile);
+    }
     return 0;
 }
